@@ -18,6 +18,7 @@ module.exports = {
   // required to lint *.vue files
   plugins: [
     'vue'
+    // 'html'
   ],
   // add your custom rules here
   rules: {
@@ -28,6 +29,7 @@ module.exports = {
     // allow debugger during development
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'eol-last': 0,
-    'space-before-function-paren': 0
+    'space-before-function-paren': 0,
+    'indent': ['off', 2]
   }
 }
