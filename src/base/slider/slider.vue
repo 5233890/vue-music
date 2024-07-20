@@ -3,7 +3,10 @@
     <div class="slider-group" ref="sliderGroup">
       <slot></slot>
     </div>
-    <div class="dots"></div>
+    <div class="dots">
+      <span class="dot" v-for="(item, index) in dots" :key="index"
+            :class="{active: currentPageIndex === index}"></span>
+    </div>
   </div>
 </template>
 
@@ -16,25 +19,57 @@
         type: Boolean,
         default: true
       },
-      autoplay: {
+      autoPlay: {
         type: Boolean,
         default: true
       },
       interval: {
         type: Number,
-        default: 4000
+        default: 400
+      }
+    },
+    watch: {
+      currentPageIndex (val) {
+//        console.log('currentPageIndex', val)
+      }
+    },
+    data () {
+      return {
+        dots: [],
+        currentPageIndex: 0
       }
     },
     mounted () {
       setTimeout(() => {
         this._setSliderWidth()
+        this._initDots()
         this._initSlider()
+
+        if (this.autoPlay) {
+          this._play()
+        }
       }, 20)
+      window.addEventListener('resize', () => {
+        if (!this.slider) {
+          return
+        }
+        console.log('onResize')
+        this._setSliderWidth(true)
+        this.slider.refresh()
+      })
     },
     methods: {
-      _setSliderWidth () {
+      setNewMethod () {
+        const a = {
+          name: '张三',
+          age: 12
+        }
+        console.log(a, '=====')
+      },
+      _setSliderWidth (isResize) {
         this.children = this.$refs.sliderGroup.children
         let width = 0
+        // 这个宽度应该默认占满父容器宽度
         let sliderWidth = this.$refs.slider.clientWidth
         for (let i = 0; i < this.children.length; i++) {
           let child = this.children[i]
@@ -42,10 +77,13 @@
           child.style.width = sliderWidth + 'px'
           width += sliderWidth
         }
-        if (this.loop) {
-          width += 2 * width
+        if (this.loop && !isResize) {
+          width += 2 * sliderWidth
         }
-        this.$refs.slider.style.width = width + 'px'
+        this.$refs.sliderGroup.style.width = width + 'px'
+      },
+      _initDots () {
+        this.dots = new Array(this.children.length)
       },
       _initSlider () {
         this.slider = new BScroll(this.$refs.slider, {
@@ -55,9 +93,34 @@
           snap: true,
           snapLoop: this.loop,
           snapThreshold: 0.3,
-          snapSpeed: 400
+          snapSpeed: 1000
         })
+        this.slider.on('scrollEnd', () => {
+          let pageIndex = this.slider.getCurrentPage().pageX
+          if (this.loop) {
+            pageIndex -= 1
+          }
+          this.currentPageIndex = pageIndex
+          if (this.autoPlay) {
+            clearTimeout(this.timer)
+            this.timer = null
+            this._play()
+          }
+        })
+      },
+      _play () {
+        let pageIndex = this.currentPageIndex + 1
+        if (this.loop) {
+          pageIndex += 1
+        }
+        this.timer = setTimeout(() => {
+          this.slider.goToPage(pageIndex, 0, 1000)
+        }, this.interval)
       }
+    },
+    destroyed () {
+      clearTimeout(this.timer)
+      this.timer = null
     }
   }
 </script>
