@@ -1,5 +1,5 @@
 <template>
-  <div ref = 'wrapper'>
+  <div ref="wrapper">
     <slot></slot>
   </div>
 </template>
@@ -51,6 +51,7 @@ export default {
       this.scroll && this.scroll.disable()
     },
     refresh () {
+      console.log('refresh', this.$refs.wrapper.children[0].clientHeight)
       this.scroll && this.scroll.refresh()
     }
   }

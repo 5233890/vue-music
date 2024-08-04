@@ -1,17 +1,17 @@
 <template>
   <div class="recommend">
-    <scroll class="recommend-content" :data="discList">
-      <div>
-        <div v-if="recommends.length" class="slider-wrapper">
+    <scroll ref="scroll" class="recommend-content" :data="discList">
+      <div ref="scrollContent">
+        <div v-if="recommends.length" class="slider-wrapper" ref="sliderWrapper">
           <slider>
             <div v-for="(item, index) in recommends" :key="index">
               <a :herf="item.linkUrl">
-                <img :src="item.picUrl">
+                <img @load="loadImg" :src="item.picUrl">
               </a>
             </div>
           </slider>
         </div>
-        <div class="recommend-list">
+        <div class="recommend-list" v-if="discList.length">
           <h1 class="list-title">热门歌曲推荐</h1>
           <ul>
             <li v-for="(item, index) in discList" :key="index" class="item">
@@ -44,7 +44,10 @@
       }
     },
     created () {
-      this._getRecommend()
+      setTimeout(() => {
+        this._getRecommend()
+      }, 2000)
+      // this._getRecommend()
       this._getDiscList()
     },
     methods: {
@@ -58,10 +61,21 @@
       _getDiscList () {
         getDiscList().then(res => {
           if (res.code === ERR_OK) {
-            console.log('getDiscList', res.data.list)
             this.discList = res.data.list
           }
         })
+      },
+      loadImg () {
+        if (!this.checkLoad) {
+          console.log('loadImg')
+          console.log('sliderWrapper', this.$refs.sliderWrapper.clientHeight)
+          // 在setTimeout里面才能获取到组件的正确的渲染高度
+          setTimeout(() => {
+            console.log('sliderWrapper111', this.$refs.sliderWrapper.clientHeight)
+            this.$refs.scroll.refresh()
+          }, 20)
+          this.checkLoad = true
+        }
       }
     }
   }
