@@ -5,8 +5,8 @@
         <div v-if="recommends.length" class="slider-wrapper" ref="sliderWrapper">
           <slider>
             <div v-for="(item, index) in recommends" :key="index">
-              <a :herf="item.linkUrl">
-                <img @load="loadImg" :src="item.picUrl">
+              <a :href="item.linkUrl">
+                <img class="needsclick" @load="loadImg" :src="item.picUrl">
               </a>
             </div>
           </slider>
@@ -16,7 +16,7 @@
           <ul>
             <li v-for="(item, index) in discList" :key="index" class="item">
               <div class="icon">
-                <img width="60" height="60" :src="item.imgurl">
+                <img width="60" height="60" v-lazy="item.imgurl">
               </div>
               <div class="text">
                 <h2 class="name" v-html="item.creator.name"></h2>
@@ -44,17 +44,22 @@
       }
     },
     created () {
-      setTimeout(() => {
-        this._getRecommend()
-      }, 2000)
-      // this._getRecommend()
+      // setTimeout(() => {
+      //   this._getRecommend()
+      // }, 2000)
+      this._getRecommend()
       this._getDiscList()
     },
     methods: {
       _getRecommend () {
         getCommend().then(res => {
           if (res.code === ERR_OK) {
-            this.recommends = res.data.slider
+            this.recommends = res.data.slider.map(item => {
+              return {
+                ...item,
+                linkUrl: 'https://y.qq.com/'
+              }
+            })
           }
         })
       },
@@ -69,11 +74,12 @@
         if (!this.checkLoad) {
           console.log('loadImg')
           console.log('sliderWrapper', this.$refs.sliderWrapper.clientHeight)
+          this.$refs.scroll.refresh()
           // 在setTimeout里面才能获取到组件的正确的渲染高度
-          setTimeout(() => {
-            console.log('sliderWrapper111', this.$refs.sliderWrapper.clientHeight)
-            this.$refs.scroll.refresh()
-          }, 20)
+          // setTimeout(() => {
+          //   console.log('sliderWrapper111', this.$refs.sliderWrapper.clientHeight)
+          //   this.$refs.scroll.refresh()
+          // }, 20)
           this.checkLoad = true
         }
       }
