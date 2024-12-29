@@ -26,17 +26,21 @@
           </ul>
         </div>
       </div>
+      <div class="loading-container" v-show="discList.length">
+        <Loading></Loading>
+      </div>
     </scroll>
   </div>
 </template>
 
 <script>
+  import Loading from "base/loading/loading";
   import Slider from 'base/slider/slider'
   import Scroll from 'base/scroll/scroll'
   import {getCommend, getDiscList} from 'api/recommend.js'
   import {ERR_OK} from 'api/config'
   export default {
-    components: {Slider, Scroll},
+    components: {Slider, Scroll, Loading},
     data () {
       return {
         recommends: [],
